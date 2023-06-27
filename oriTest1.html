@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>重力球效果</title>
+    <style>
+        body {
+            background: #252525;
+        }
+        
+        canvas {
+            display: block;
+            margin: 0px auto;
+        }
+        
+        .tips {
+            color: red;
+            position: absolute;
+            left: 50px;
+        }
+    </style>
+    <script src='./matter-0.7.0.min.js'></script>
+</head>
+
+<body>
+    <p class="tips" style="top:30px;" id="stage-X">上下水平：</p>
+    <p class="tips" style="top:50px;" id="stage-Y">左右水平：</p>
+</body>
+<script>
+    var canvas = {
+        width: document.body.clientWidth - 20,
+        height: 500
+    }
+
+    var Engine = Matter.Engine,
+        World = Matter.World,
+        Body = Matter.Body,
+        Bodies = Matter.Bodies,
+        Constraint = Matter.Constraint,
+        Composites = Matter.Composites,
+        MouseConstraint = Matter.MouseConstraint;
+
+    var engine = Engine.create(document.body, {
+        render: {
+            options: {
+                showAngleIndicator: false,
+                wireframes: false,
+                width: canvas.width,
+                height: canvas.height
+            }
+        }
+    });
+
+    /* Mouse interaction with all objects */
+    var mouseConstraint = MouseConstraint.create(engine);
+    World.add(engine.world, mouseConstraint);
+
+    function createObject(options) {
+        if (options.type == 'rect') {
+            return Bodies.rectangle(options.x, options.y, options.width, options.height, {
+                isStatic: options.static,
+                angle: options.angle,
+                render: {
+                    fillStyle: options.fillColor,
+                    strokeStyle: options.strokeColor
+                }
+            });
+        } else if (type = 'circle') {
+            return Bodies.circle(options.x, options.y, options.size, {
+                density: options.density,
+                frictionAir: options.frictionAir,
+                isStatic: options.static,
+                render: {
+                    fillStyle: options.fillColor,
+                    strokeStyle: options.strokeColor
+                }
+            });
+        }
+    }
+
+    // Ball
+    var ball = createObject({
+        type: 'circle',
+        x: canvas.width / 2,
+        y: 30,
+        size: 20,
+        static: null,
+        density: 10,
+        frictionAir: 0.001,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    // Ground
+    var ground = createObject({
+        type: 'rect',
+        x: (canvas.width / 2),
+        y: canvas.height,
+        angle: 0,
+        width: canvas.width,
+        height: 20,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    // Left
+    var piece1 = createObject({
+        type: 'rect',
+        x: 0,
+        y: (canvas.height / 2),
+        angle: 0,
+        width: 20,
+        height: canvas.height,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    // Right
+    var piece2 = createObject({
+        type: 'rect',
+        x: canvas.width,
+        y: (canvas.height / 2),
+        angle: 0,
+        width: 20,
+        height: canvas.height,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+
+    // Top
+    var piece3 = createObject({
+        type: 'rect',
+        x: (canvas.width / 2),
+        y: 0,
+        angle: 0,
+        width: canvas.width,
+        height: 20,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    var w1 = createObject({
+        type: 'rect',
+        x: 210,
+        y: 770,
+        angle: 0,
+        width: 150,
+        height: 100,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    var w2 = createObject({
+        type: 'rect',
+        x: 725,
+        y: 770,
+        angle: 0,
+        width: 350,
+        height: 200,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    var w3 = createObject({
+        type: 'rect',
+        x: (canvas.width / 2),
+        y: 500,
+        angle: 0,
+        width: canvas.width - 300,
+        height: 100,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    var w4 = createObject({
+        type: 'rect',
+        x: 210,
+        y: 220,
+        angle: 0,
+        width: 100,
+        height: 200,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    var w5 = createObject({
+        type: 'rect',
+        x: 10,
+        y: 220,
+        angle: 0,
+        width: 150,
+        height: 100,
+        static: true,
+        fillColor: 'lightgrey',
+        strokeColor: 'black'
+    });
+
+    // create function to update output values & manipulate gravity
+    // function gravOutputUpdate(id, axis, val) {
+    //     console.log(id + ":" + axis + ":" +
+    //         val);
+    //     document.getElementById(id).innerHTML = val;
+    //     engine.world.gravity[axis] = val;
+    // }
+    // setInterval(function() {
+    //     var num = Math.ceil(Math.random() * 1000000000 % 9);
+    //     var i = 0.1;
+    //     if (num % 2 == 0) {
+    //         num = -0.1;
+    //     }
+    //     console.log(num * i);
+    //     engine.world.gravity['x'] = num * i;
+    //     engine.world.gravity['y'] = num * i;
+
+    // }, 3000);
+    //重力感应计算x,y轴
+    window.addEventListener('deviceorientation', DeviceOrientationHandler, false);
+
+    function DeviceOrientationHandler(event) {
+        var event = event || window.event;
+        var alpha = event.alpha, //gamma为Z轴旋转角度,数据类型为object
+            beta = event.beta, //gamma为X轴旋转角度,数据类型为object
+            gamma = event.gamma; //gamma为Y轴旋转角度,数据类型为object
+        var stageY = document.getElementById('stage-Y');
+        var stageX = document.getElementById('stage-X');
+        // var deriveW = document.body.clientWidth; //获得设备的宽度
+        // var speed = (deriveW / 90) * (Number(gamma)); //手机旋转时，游戏人物移动速率
+        if (alpha != null || beta != null || gamma != null) {
+            if (gamma > 0) {
+                stageY.innerHTML = "向右倾斜" + gamma + "度";
+            } else {
+                stageY.innerHTML = "向左倾斜" + gamma + "度";
+            }
+            if (beta > 0) {
+                stageX.innerHTML = "向上倾斜" + beta + "度";
+            } else {
+                stageX.innerHTML = "向下倾斜" + beta + "度";
+            }
+            engine.world.gravity['y'] = gamma * 0.01;
+            engine.world.gravity['x'] = beta * 0.01;
+        }
+
+    }
+
+    // Add everything
+    World.add(engine.world, [ball, piece1, piece2, piece3, ground, w1, w2, w3, w4, w5]);
+    Engine.run(engine);
+</script>
+
+</html>
